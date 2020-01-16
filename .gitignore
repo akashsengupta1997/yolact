@@ -157,3 +157,6 @@ vid/
 vidres/
 
 _.py
+
+# Predictions
+predictions*
