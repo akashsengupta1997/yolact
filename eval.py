@@ -619,7 +619,8 @@ def evalimage(net, path, save_path=None, save_mask_path=None):
     else:
         print(frame.shape, human_mask.shape)
         frame = frame.cpu().detach().numpy()
-        overlay = cv2.addWeighted(frame, 1.0, np.tile(human_mask[:, :, None], [1, 1, 3]), 0.5, gamma=0)
+        overlay = cv2.addWeighted(frame, 1.0, 255.0*np.tile(human_mask[:, :, None], [1, 1, 3]),
+                                  0.5, gamma=0)
         # plt.figure()
         # plt.imshow(frame.cpu().detach().numpy()/255.0)
         # plt.imshow(human_mask, alpha=0.4)
