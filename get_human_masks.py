@@ -1,4 +1,6 @@
 import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import argparse
 import numpy as np
 import torch
@@ -277,12 +279,8 @@ if __name__ == '__main__':
     parser.add_argument('--emulate_playback', default=False, dest='emulate_playback',
                         action='store_true',
                         help='When saving a video, emulate the framerate that you\'d get running in real-time mode.')
-    parser.add_argument('--gpu', type=str, default='0')
 
     args = parser.parse_args()
-
-    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
     inp, out = args.images.split(':')
 
