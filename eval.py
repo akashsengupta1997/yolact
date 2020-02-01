@@ -600,16 +600,31 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
     preds = net(batch)
 
     img_numpy, masks = prep_display(preds, frame, None, None, undo_transform=False)
-    
+    masks = masks.cpu().detach().numpy()[:, :, :, 0]
+    print(masks.shape)
+    largest_sum_mask_index = np.argmax(np.sum(masks, axis=(1, 2)), axis=0)
+    print(largest_sum_mask_index)
     if save_path is None:
         img_numpy = img_numpy[:, :, (2, 1, 0)]
 
-    if save_path is None:
-        plt.imshow(img_numpy)
-        plt.title(path)
-        plt.show()
-    else:
-        cv2.imwrite(save_path, img_numpy)
+    # if save_path is None:
+    plt.figure()
+    plt.subplot(121)
+    plt.imshow(img_numpy)
+    plt.subplot(122)
+    plt.imshow(masks[largest_sum_mask_index, :, :])
+    plt.show()
+    # else:
+    #    cv2.imwrite(save_path, img_numpy)
+    # if save_path is None:
+    #     img_numpy = img_numpy[:, :, (2, 1, 0)]
+    #
+    # if save_path is None:
+    #     plt.imshow(img_numpy)
+    #     plt.title(path)
+    #     plt.show()
+    # else:
+    #     cv2.imwrite(save_path, img_numpy)
 
 def evalimages(net:Yolact, input_folder:str, output_folder:str):
     if not os.path.exists(output_folder):
