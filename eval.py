@@ -597,51 +597,50 @@ def badhash(x):
     x =  ((x >> 16) ^ x) & 0xFFFFFFFF
     return x
 
-def evalimage(net:Yolact, path:str, save_path:str=None):
+def evalimage(net, path, save_path=None, save_mask_path=None):
     frame = torch.from_numpy(cv2.imread(path)).cuda().float()
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
 
     img_numpy, human_masks = prep_display(preds, frame, None, None, undo_transform=False)
     human_masks = human_masks.cpu().detach().numpy()[:, :, :, 0]
-    print(human_masks.shape)
     largest_sum_mask_index = np.argmax(np.sum(human_masks, axis=(1, 2)), axis=0)
-    print(largest_sum_mask_index)
+    human_mask = human_masks[largest_sum_mask_index, :, :]
     if save_path is None:
         img_numpy = img_numpy[:, :, (2, 1, 0)]
 
-    # if save_path is None:
-    plt.figure()
-    plt.subplot(121)
-    plt.imshow(img_numpy)
-    plt.subplot(122)
-    plt.imshow(human_masks[largest_sum_mask_index, :, :])
-    plt.show()
-    # else:
-    #    cv2.imwrite(save_path, img_numpy)
-    # if save_path is None:
-    #     img_numpy = img_numpy[:, :, (2, 1, 0)]
-    #
-    # if save_path is None:
-    #     plt.imshow(img_numpy)
-    #     plt.title(path)
-    #     plt.show()
-    # else:
-    #     cv2.imwrite(save_path, img_numpy)
+    if save_path is None:
+        plt.figure()
+        plt.subplot(121)
+        plt.imshow(img_numpy)
+        plt.subplot(122)
+        plt.imshow(human_mask)
+        plt.show()
+    else:
+        cv2.imwrite(save_path, img_numpy)
+        cv2.imwrite(save_mask_path, human_mask)
+
 
 def evalimages(net:Yolact, input_folder:str, output_folder:str):
-    if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+    img_fname = [f for f in sorted(os.listdir(input_folder)) if f.endswith('.png')]
 
-    print()
-    for p in Path(input_folder).glob('*'): 
-        path = str(p)
-        name = os.path.basename(path)
-        name = '.'.join(name.split('.')[:-1]) + '.png'
-        out_path = os.path.join(output_folder, name)
+    for fname in img_fname:
+        print(fname)
+        img_path = os.path.join(input_folder, fname)
+        if output_folder == 'yolact_for_dataset':
+            output_vis_folder = input_folder.replace('cropped_frames', 'yolact_vis')
+            output_mask_folder = input_folder.replace('cropped_frames', 'yolact_masks')
+            os.makedirs(output_vis_folder, exist_ok=True)
+            os.makedirs(output_mask_folder, exist_ok=True)
+            output_vis_path = os.path.join(output_vis_folder, fname)
+            output_mask_path = os.path.join(output_mask_folder, fname)
+        else:
+            os.makedirs(output_folder, exist_ok=True)
+            output_vis_path = os.path.join(output_folder, fname)
+            output_mask_path = None
 
-        evalimage(net, path, out_path)
-        print(path + ' -> ' + out_path)
+        evalimage(net, img_path, output_vis_path, output_mask_path)
+
     print('Done.')
 
 from multiprocessing.pool import ThreadPool
