@@ -618,12 +618,14 @@ def evalimage(net, path, save_path=None, save_mask_path=None):
         plt.show()
     else:
         print(frame.shape, human_mask.shape)
-        plt.figure()
-        plt.imshow(frame.cpu().detach().numpy()/255.0)
-        plt.imshow(human_mask, alpha=0.4)
-        plt.savefig(save_path)
-        plt.close()
-        # cv2.imwrite(, img_numpy)
+        frame = frame.cpu().detach().numpy()
+        overlay = cv2.addWeighted(frame, 1.0, human_mask, 0.5, gamma=0)
+        # plt.figure()
+        # plt.imshow(frame.cpu().detach().numpy()/255.0)
+        # plt.imshow(human_mask, alpha=0.4)
+        # plt.savefig(save_path)
+        # plt.close()
+        cv2.imwrite(save_path, overlay)
         cv2.imwrite(save_mask_path, human_mask)
 
 
