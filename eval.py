@@ -639,6 +639,7 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
         output_mask_folder = input_folder.replace('cropped_frames', 'yolact_masks')
         os.makedirs(output_vis_folder, exist_ok=True)
         os.makedirs(output_mask_folder, exist_ok=True)
+        print("Saving to:", output_mask_folder)
     else:
         os.makedirs(output_folder, exist_ok=True)
 
@@ -648,7 +649,6 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
         if output_folder == 'yolact_for_dataset':
             output_vis_path = os.path.join(output_vis_folder, fname)
             output_mask_path = os.path.join(output_mask_folder, fname)
-            print("Saving to:", output_mask_folder)
         else:
             output_vis_path = os.path.join(output_folder, fname)
             output_mask_path = None
