@@ -617,10 +617,12 @@ def evalimage(net, path, save_path=None, save_mask_path=None):
         plt.imshow(human_mask)
         plt.show()
     else:
+        print(frame.shape, human_mask.shape)
         plt.figure()
-        plt.imshow(img_numpy)
+        plt.imshow(frame.cpu().detach().numpy())
         plt.imshow(human_mask, alpha=0.7)
         plt.savefig(save_path)
+        plt.close()
         # cv2.imwrite(, img_numpy)
         cv2.imwrite(save_mask_path, human_mask)
 
