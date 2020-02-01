@@ -605,7 +605,7 @@ def evalimage(net, path, save_path=None, save_mask_path=None):
     img_numpy, human_masks = prep_display(preds, frame, None, None, undo_transform=False)
     human_masks = human_masks.cpu().detach().numpy()[:, :, :, 0]
     if human_masks.shape[0] == 0:
-        print(human_masks)
+        return
     largest_sum_mask_index = np.argmax(np.sum(human_masks, axis=(1, 2)), axis=0)
     human_mask = human_masks[largest_sum_mask_index, :, :]
     if save_path is None:
