@@ -191,8 +191,10 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
     if args.display_masks and cfg.eval_mask_branch and num_dets_to_consider > 0:
         # After this, mask is of size [num_dets, h, w, 1]
         masks = masks[:num_dets_to_consider, :, :, None]
-        print("CLASSES:", classes, classes.shape, cfg.dataset.class_names)
-        
+
+        # Get human masks
+        human_masks = masks[classes == 0]
+
         # Prepare the RGB images for each mask given their color (size [num_dets, h, w, 1])
         colors = torch.cat([get_color(j, on_gpu=img_gpu.device.index).view(1, 1, 1, 3) for j in range(num_dets_to_consider)], dim=0)
         masks_color = masks.repeat(1, 1, 1, 3) * colors * mask_alpha
@@ -262,7 +264,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
                 cv2.putText(img_numpy, text_str, text_pt, font_face, font_scale, text_color, font_thickness, cv2.LINE_AA)
             
     
-    return img_numpy, masks
+    return img_numpy, human_masks
 
 def prep_benchmark(dets_out, h, w):
     with timer.env('Postprocess'):
@@ -600,10 +602,10 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
 
-    img_numpy, masks = prep_display(preds, frame, None, None, undo_transform=False)
-    masks = masks.cpu().detach().numpy()[:, :, :, 0]
-    print(masks.shape)
-    largest_sum_mask_index = np.argmax(np.sum(masks, axis=(1, 2)), axis=0)
+    img_numpy, human_masks = prep_display(preds, frame, None, None, undo_transform=False)
+    human_masks = human_masks.cpu().detach().numpy()[:, :, :, 0]
+    print(human_masks.shape)
+    largest_sum_mask_index = np.argmax(np.sum(human_masks, axis=(1, 2)), axis=0)
     print(largest_sum_mask_index)
     if save_path is None:
         img_numpy = img_numpy[:, :, (2, 1, 0)]
@@ -613,7 +615,7 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
     plt.subplot(121)
     plt.imshow(img_numpy)
     plt.subplot(122)
-    plt.imshow(masks[largest_sum_mask_index, :, :])
+    plt.imshow(human_masks[largest_sum_mask_index, :, :])
     plt.show()
     # else:
     #    cv2.imwrite(save_path, img_numpy)
