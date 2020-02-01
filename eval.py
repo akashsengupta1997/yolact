@@ -26,6 +26,8 @@ from pathlib import Path
 from collections import OrderedDict
 from PIL import Image
 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import cv2
 
@@ -259,7 +261,7 @@ def prep_display(dets_out, img, h, w, undo_transform=True, class_color=False, ma
                 cv2.putText(img_numpy, text_str, text_pt, font_face, font_scale, text_color, font_thickness, cv2.LINE_AA)
             
     
-    return img_numpy
+    return img_numpy, masks
 
 def prep_benchmark(dets_out, h, w):
     with timer.env('Postprocess'):
@@ -597,7 +599,7 @@ def evalimage(net:Yolact, path:str, save_path:str=None):
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
 
-    img_numpy = prep_display(preds, frame, None, None, undo_transform=False)
+    img_numpy, masks = prep_display(preds, frame, None, None, undo_transform=False)
     
     if save_path is None:
         img_numpy = img_numpy[:, :, (2, 1, 0)]
