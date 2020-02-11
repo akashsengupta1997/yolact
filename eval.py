@@ -642,6 +642,10 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
         print("Saving to:", output_mask_folder)
     else:
         os.makedirs(output_folder, exist_ok=True)
+        output_vis_folder = os.path.join(output_folder, 'yolact_vis')
+        output_mask_folder = os.path.join(output_folder, 'yolact_masks')
+        os.makedirs(output_vis_folder, exist_ok=True)
+        os.makedirs(output_mask_folder, exist_ok=True)
 
     for fname in img_fname:
         print(fname)
@@ -650,8 +654,8 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
             output_vis_path = os.path.join(output_vis_folder, fname)
             output_mask_path = os.path.join(output_mask_folder, fname)
         else:
-            output_vis_path = os.path.join(output_folder, 'yolact_vis', fname)
-            output_mask_path = os.path.join(output_folder, 'yolact_masks', fname)
+            output_vis_path = os.path.join(output_vis_folder, fname)
+            output_mask_path = os.path.join(output_mask_folder, fname)
 
         evalimage(net, img_path, output_vis_path, output_mask_path)
 
