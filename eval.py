@@ -650,8 +650,8 @@ def evalimages(net:Yolact, input_folder:str, output_folder:str):
             output_vis_path = os.path.join(output_vis_folder, fname)
             output_mask_path = os.path.join(output_mask_folder, fname)
         else:
-            output_vis_path = os.path.join(output_folder, fname)
-            output_mask_path = None
+            output_vis_path = os.path.join(output_folder, 'yolact_vis', fname)
+            output_mask_path = os.path.join(output_folder, 'yolact_masks', fname)
 
         evalimage(net, img_path, output_vis_path, output_mask_path)
 
